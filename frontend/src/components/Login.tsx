@@ -1,21 +1,23 @@
-import { validateRegistration } from "../utils/validtateRegistration";
+import { validateLogin } from "../utils/validateLogin";
 import React, { useState, FormEvent } from "react";
-import { IRegistrationErrors } from "@/interfaces/IAuth";
+import { ILoginErrors } from "@/interfaces/IAuth";
 import { useNavigate } from "react-router-dom";
 
-const Registration: React.FC = () => {
+const Login: React.FC = () => {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         confirmPassword: "",
     });
 
-    const [errors, setErrors] = useState<IRegistrationErrors>({}); //
+    const [errors, setErrors] = useState<ILoginErrors>({}); //
+
     const navigate = useNavigate();
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        const error: IRegistrationErrors = validateRegistration(formData);
+        const error: ILoginErrors = validateLogin(formData);
 
         if (Object.values(error).length) {
             setErrors(error);
@@ -35,9 +37,8 @@ const Registration: React.FC = () => {
                 {/* Header */}
                 <div className="text-center">
                     <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                        Create Your Account
+                        Login
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">Join our community today!</p>
                 </div>
 
                 {/* Form */}
@@ -84,29 +85,6 @@ const Registration: React.FC = () => {
                                 <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                             )}
                         </div>
-
-                        {/* Confirm Password */}
-                        <div className="relative">
-                            <label htmlFor="confirmPassword" className="sr-only">
-                                Confirm Password
-                            </label>
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-3 rounded-lg border ${
-                                    errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                                } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200`}
-                                placeholder="Confirm Password"
-                            />
-                            {errors.confirmPassword && (
-                                <p className="mt-1 text-sm text-red-500">
-                                    {errors.confirmPassword}
-                                </p>
-                            )}
-                        </div>
                     </div>
 
                     {/* Submit Button */}
@@ -122,12 +100,12 @@ const Registration: React.FC = () => {
 
                 {/* Footer Link */}
                 <p className="mt-2 text-center text-sm text-gray-600">
-                    Already have an account?{" "}
+                    Create an account?{" "}
                     <p
                         className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
-                        onClick={() => navigate("/login")}
+                        onClick={() => navigate("/registration")}
                     >
-                        Sign in here
+                        Sign up here
                     </p>
                 </p>
             </div>
@@ -135,4 +113,4 @@ const Registration: React.FC = () => {
     );
 };
 
-export default Registration;
+export default Login;
