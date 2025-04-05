@@ -2,6 +2,10 @@ import { validateRegistration } from "../utils/validtateRegistration";
 import React, { useState, FormEvent } from "react";
 import { IRegistrationErrors } from "@/interfaces/IAuth";
 import { useNavigate } from "react-router-dom";
+import { signUpApi } from "../api/api";
+import LoadingSpinner from "./LoadingSpinner";
+import { Eye, EyeOff } from "react-feather";
+import toast from "react-hot-toast";
 
 const Registration: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -9,18 +13,35 @@ const Registration: React.FC = () => {
         password: "",
         confirmPassword: "",
     });
-
-    const [errors, setErrors] = useState<IRegistrationErrors>({}); //
+    const [errors, setErrors] = useState<IRegistrationErrors>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
-    const handleSubmit = (e: FormEvent) => {
+
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         const error: IRegistrationErrors = validateRegistration(formData);
-
         if (Object.values(error).length) {
             setErrors(error);
-        } else {
+            return;
+        }
+
+        try {
             setErrors({});
+            setIsLoading(true);
+            const status = await signUpApi({ email: formData.email, password: formData.password });
+            if (status.success) {
+                navigate("/login");
+            } else {
+                toast.error("Something went wrong");
+            }
+            setIsLoading(false);
+        } catch (error: any) {
+            console.error("Registration failed:", error.message);
+
+            setIsLoading(false);
         }
     };
 
@@ -54,9 +75,10 @@ const Registration: React.FC = () => {
                                 type="email"
                                 value={formData.email}
                                 onChange={handleChange}
+                                disabled={isLoading}
                                 className={`w-full px-4 py-3 rounded-lg border ${
                                     errors.email ? "border-red-500" : "border-gray-300"
-                                } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200`}
+                                } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200 disabled:opacity-50`}
                                 placeholder="Email address"
                             />
                             {errors.email && (
@@ -69,17 +91,28 @@ const Registration: React.FC = () => {
                             <label htmlFor="password" className="sr-only">
                                 Password
                             </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-3 rounded-lg border ${
-                                    errors.password ? "border-red-500" : "border-gray-300"
-                                } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200`}
-                                placeholder="Password"
-                            />
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    className={`w-full px-4 py-3 rounded-lg border ${
+                                        errors.password ? "border-red-500" : "border-gray-300"
+                                    } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200 disabled:opacity-50`}
+                                    placeholder="Password"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    disabled={isLoading}
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
                             {errors.password && (
                                 <p className="mt-1 text-sm text-red-500">{errors.password}</p>
                             )}
@@ -90,17 +123,30 @@ const Registration: React.FC = () => {
                             <label htmlFor="confirmPassword" className="sr-only">
                                 Confirm Password
                             </label>
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-3 rounded-lg border ${
-                                    errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                                } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200`}
-                                placeholder="Confirm Password"
-                            />
+                            <div className="relative">
+                                <input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    className={`w-full px-4 py-3 rounded-lg border ${
+                                        errors.confirmPassword
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 text-gray-900 transition-all duration-200 disabled:opacity-50`}
+                                    placeholder="Confirm Password"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    disabled={isLoading}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
                             {errors.confirmPassword && (
                                 <p className="mt-1 text-sm text-red-500">
                                     {errors.confirmPassword}
@@ -113,9 +159,18 @@ const Registration: React.FC = () => {
                     <div>
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5"
+                            disabled={isLoading}
+                            className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 ${
+                                isLoading ? "opacity-75 cursor-not-allowed" : ""
+                            }`}
                         >
-                            Register Now
+                            {isLoading ? (
+                                <span className="flex items-center">
+                                    <LoadingSpinner />
+                                </span>
+                            ) : (
+                                "Register Now"
+                            )}
                         </button>
                     </div>
                 </form>
@@ -123,12 +178,14 @@ const Registration: React.FC = () => {
                 {/* Footer Link */}
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Already have an account?{" "}
-                    <p
-                        className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
-                        onClick={() => navigate("/login")}
+                    <span
+                        className={`font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200 ${
+                            isLoading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                        }`}
+                        onClick={() => !isLoading && navigate("/login")}
                     >
                         Sign in here
-                    </p>
+                    </span>
                 </p>
             </div>
         </div>

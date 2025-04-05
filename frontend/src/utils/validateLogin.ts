@@ -1,7 +1,7 @@
-import { IRegistrationFormData } from "@/interfaces/IAuth";
+import { ILoginFormData } from "@/interfaces/IAuth";
 import { ILoginErrors } from "@/interfaces/IAuth";
 
-export const validateLogin = (formData: IRegistrationFormData): ILoginErrors => {
+export const validateLogin = (formData: ILoginFormData): ILoginErrors => {
     const errors: ILoginErrors = {};
 
     // Email validation
