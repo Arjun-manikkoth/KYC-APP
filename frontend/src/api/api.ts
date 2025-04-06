@@ -18,6 +18,7 @@ const signInApi = async (formData: ILogin) => {
         };
     }
 };
+
 //api sends signup data to the server
 const signUpApi = async (formData: IRegistration) => {
     try {

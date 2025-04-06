@@ -3,7 +3,7 @@ import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./database/database";
-// import userRoute from "./Routes/UserRoutes";
+import userRoute from "./routes/route";
 
 const app: Express = express();
 
@@ -28,8 +28,8 @@ app.use(cookieParser());
 app.use(express.urlencoded());
 app.use(express.json());
 
-//user router
-// app.use("/users", userRoute);
+//router
+app.use("/", userRoute);
 
 //port configuration
 const PORT: number | string = process.env.PORT || 5000;

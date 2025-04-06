@@ -34,7 +34,7 @@ const Login: React.FC = () => {
             if (status.success) {
                 navigate("/dashboard");
             } else {
-                toast.error("Something went wrong");
+                toast.error(status.message);
             }
             setIsLoading(false);
         } catch (error: any) {

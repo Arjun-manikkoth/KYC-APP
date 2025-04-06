@@ -34,8 +34,9 @@ const Registration: React.FC = () => {
             const status = await signUpApi({ email: formData.email, password: formData.password });
             if (status.success) {
                 navigate("/login");
+                toast.success("Login to Continue");
             } else {
-                toast.error("Something went wrong");
+                toast.error(status.message);
             }
             setIsLoading(false);
         } catch (error: any) {
