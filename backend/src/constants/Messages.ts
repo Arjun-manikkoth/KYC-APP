@@ -7,8 +7,15 @@ export const AuthMessages = {
     SIGN_UP_SUCCESS: "Account created successfully",
     SIGN_IN_SUCCESS: "Successfully signed in",
     ACCOUNT_EXISTS: "Account exists already",
+    SIGN_OUT_SUCCESS: "Signed out sucessfully",
 };
 
 export const GeneralMessages = {
     INTERNAL_SERVER_ERROR: "An unexpected error occurred",
+};
+
+export const tokenMessages = {
+    REFRESH_TOKEN_MISSING: "Refresh Token missing",
+    ACCESS_TOKEN_SUCCESS: "Access Token sent successfully",
+    TOKEN_ERROR: "Token error",
 };

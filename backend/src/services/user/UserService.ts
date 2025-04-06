@@ -6,6 +6,8 @@ import { hashPassword, comparePasswords } from "../../utils/HashPassword";
 import { AuthMessages, GeneralMessages } from "../../constants/Messages";
 import { HTTP_STATUS } from "../../constants/StatusCodes";
 import { generateTokens } from "../../utils/GenerateTokens";
+import { verifyToken } from "../../utils/CheckToken";
+import { IRefreshTokenResponse } from "../../interfaces/IRefreshToken";
 
 class UserService implements IUserService {
     constructor(private userRepository: IUserRepository) {}
@@ -82,6 +84,31 @@ class UserService implements IUserService {
         } catch (error: any) {
             console.log(error.message);
             throw new Error("Failed to sign in");
+        }
+    }
+
+    async refreshTokenCheck(token: string): Promise<IRefreshTokenResponse> {
+        try {
+            const tokenStatus = await verifyToken(token);
+
+            if (tokenStatus.id && tokenStatus.email && tokenStatus.role) {
+                const tokens = generateTokens(tokenStatus.id, tokenStatus.email, tokenStatus.role);
+
+                return {
+                    statusCode: HTTP_STATUS.CREATED,
+                    accessToken: tokens.accessToken,
+                    message: tokenStatus.message,
+                };
+            }
+
+            return {
+                statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                accessToken: null,
+                message: tokenStatus.message,
+            };
+        } catch (error: any) {
+            console.log(error.message);
+            throw new Error("Failed to create refresh token");
         }
     }
 }

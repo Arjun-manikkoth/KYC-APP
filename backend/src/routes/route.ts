@@ -3,6 +3,7 @@ import express from "express";
 import UserController from "../controllers/UserController";
 import UserRepository from "../repositories/user/UserRepository";
 import UserService from "../services/user/UserService";
+import verifyToken from "../middlewares/JwtVerify";
 
 const userRoute: Router = express.Router();
 
@@ -20,5 +21,9 @@ const userController = new UserController(userService);
 userRoute.route("/sign-in").post((req, res) => userController.signIn(req, res));
 
 userRoute.route("/sign-up").post((req, res) => userController.signUp(req, res));
+
+userRoute.route("/sign-out").get((req, res) => userController.signOut(req, res));
+
+userRoute.route("/refresh-token").post((req, res) => userController.refreshToken(req, res));
 
 export default userRoute;

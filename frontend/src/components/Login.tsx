@@ -6,6 +6,8 @@ import { signInApi } from "../api/api";
 import LoadingSpinner from "./LoadingSpinner";
 import { Eye, EyeOff } from "react-feather";
 import toast from "react-hot-toast";
+import { setUser } from "@/redux/userSlice";
+import { useDispatch } from "react-redux";
 
 const Login: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -17,6 +19,7 @@ const Login: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -30,8 +33,11 @@ const Login: React.FC = () => {
         try {
             setErrors({});
             setIsLoading(true);
+
             const status = await signInApi({ email: formData.email, password: formData.password });
+
             if (status.success) {
+                dispatch(setUser({ email: status.data.email, id: status.data.id }));
                 navigate("/dashboard");
             } else {
                 toast.error(status.message);

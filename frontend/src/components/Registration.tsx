@@ -13,6 +13,7 @@ const Registration: React.FC = () => {
         password: "",
         confirmPassword: "",
     });
+
     const [errors, setErrors] = useState<IRegistrationErrors>({});
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +35,7 @@ const Registration: React.FC = () => {
             const status = await signUpApi({ email: formData.email, password: formData.password });
             if (status.success) {
                 navigate("/login");
+
                 toast.success("Login to Continue");
             } else {
                 toast.error(status.message);

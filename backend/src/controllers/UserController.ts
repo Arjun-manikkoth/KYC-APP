@@ -1,6 +1,6 @@
 import IUserService from "../services/user/IUserService";
 import { Request, Response } from "express";
-import { AuthMessages, GeneralMessages } from "../constants/Messages";
+import { AuthMessages, GeneralMessages, tokenMessages } from "../constants/Messages";
 import { HTTP_STATUS } from "../constants/StatusCodes";
 
 class UserController {
@@ -61,16 +61,16 @@ class UserController {
                 res.status(HTTP_STATUS.OK)
                     .cookie("accessToken", response.accessToken, {
                         httpOnly: true,
-                        secure: true,
-                        sameSite: "none",
+                        secure: false,
+                        // sameSite: "none",
                         maxAge: process.env.MAX_AGE_ACCESS_COOKIE
                             ? parseInt(process.env.MAX_AGE_ACCESS_COOKIE)
                             : 15 * 60 * 1000, // 15 minutes
                     })
                     .cookie("refreshToken", response.refreshToken, {
                         httpOnly: true,
-                        secure: true,
-                        sameSite: "none",
+                        secure: false,
+                        //sameSite: "none",
                         maxAge: process.env.MAX_AGE_REFRESH_COOKIE
                             ? parseInt(process.env.MAX_AGE_REFRESH_COOKIE)
                             : 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -103,6 +103,80 @@ class UserController {
             }
         } catch (error: any) {
             console.log(error.message);
+            res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: GeneralMessages.INTERNAL_SERVER_ERROR,
+                data: null,
+            });
+        }
+    }
+
+    async signOut(req: Request, res: Response): Promise<void> {
+        try {
+            res.clearCookie("accessToken", {
+                httpOnly: true,
+                secure: false, //sameSite: "none"
+            });
+            res.clearCookie("refreshToken", {
+                httpOnly: true,
+                secure: false, // sameSite: "none"
+            });
+
+            res.status(HTTP_STATUS.OK).json({
+                success: true,
+                message: AuthMessages.SIGN_OUT_SUCCESS,
+                data: null,
+            });
+        } catch (error: any) {
+            console.error(error.message);
+            res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: GeneralMessages.INTERNAL_SERVER_ERROR,
+                data: null,
+            });
+        }
+    }
+
+    // Refresh token logic
+    async refreshToken(req: Request, res: Response): Promise<void> {
+        try {
+            const token = req.cookies.refreshToken;
+
+            if (!token) {
+                res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                    success: false,
+                    message: tokenMessages.REFRESH_TOKEN_MISSING,
+                    data: null,
+                });
+                return;
+            }
+
+            const response = await this.userService.refreshTokenCheck(token);
+
+            if (response.statusCode === HTTP_STATUS.CREATED) {
+                res.status(HTTP_STATUS.CREATED)
+                    .cookie("accessToken", response.accessToken, {
+                        httpOnly: true,
+                        secure: false,
+                        //   sameSite: "none",
+                        maxAge: process.env.MAX_AGE_ACCESS_COOKIE
+                            ? parseInt(process.env.MAX_AGE_ACCESS_COOKIE)
+                            : 15 * 60 * 1000, // 15 minutes
+                    })
+                    .json({
+                        success: true,
+                        message: tokenMessages.ACCESS_TOKEN_SUCCESS,
+                        data: null,
+                    });
+            } else {
+                res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                    success: false,
+                    message: response.message,
+                    data: null,
+                });
+            }
+        } catch (error: any) {
+            console.error(error.message);
             res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: GeneralMessages.INTERNAL_SERVER_ERROR,
