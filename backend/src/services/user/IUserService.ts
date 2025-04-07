@@ -7,4 +7,5 @@ export default interface IUserService {
     authenticateUser(userData: ISignIn): Promise<ISignInResponse>;
     refreshTokenCheck(token: string): Promise<IRefreshTokenResponse>;
     uploadVideo(video: Express.Multer.File, userId: string): Promise<void>;
+    uploadImage(image: Express.Multer.File, userId: string): Promise<void>;
 }

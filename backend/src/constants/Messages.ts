@@ -25,3 +25,9 @@ export const videoMessages = {
     VIDEO_UPLOAD_SUCCESS: "Video uploaded successfully",
     VIDEO_UPLOAD_FAILED: "Failed to upload video",
 };
+
+export const imageMessages = {
+    IMAGE_UPLOAD_REQUIRED_FIELDS: "User id and image are required fields",
+    IMAGE_UPLOAD_SUCCESS: "Image uploaded successfully",
+    IMAGE_UPLOAD_FAILED: "Failed to upload image",
+};

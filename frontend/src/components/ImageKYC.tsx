@@ -1,10 +1,14 @@
+import { saveImageApi } from "@/api/api";
 import React, { useRef, useState, useCallback } from "react";
+import { useSelector } from "react-redux";
 import Webcam from "react-webcam";
+import { RootState } from "@/redux/store";
 
 const ImageKYC: React.FC = () => {
     const webcamRef = useRef<Webcam>(null);
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const user = useSelector((state: RootState) => state.user);
 
     const videoConstraints = {
         width: 1280,
@@ -17,7 +21,9 @@ const ImageKYC: React.FC = () => {
             setError("Camera not accessible. Please allow camera permissions.");
             return;
         }
+
         const image = webcamRef.current.getScreenshot();
+
         if (!image) {
             setError("Failed to capture image.");
             return;
@@ -25,17 +31,14 @@ const ImageKYC: React.FC = () => {
         setImageSrc(image);
     }, []);
 
-    const handleSaveImage = useCallback(() => {
+    const handleSaveImage = useCallback(async () => {
         if (!imageSrc) {
             setError("No image captured yet.");
             return;
         }
-        const a = document.createElement("a");
-        a.href = imageSrc;
-        a.download = "kyc-image.jpeg";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+
+        await saveImageApi(imageSrc, user.id || "");
+
         setImageSrc(null);
     }, [imageSrc]);
 

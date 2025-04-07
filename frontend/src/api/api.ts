@@ -74,7 +74,7 @@ const refreshTokenApi = async () => {
     }
 };
 
-//api for refreshing access token
+//api for saving video
 const saveVideoApi = async (videoBlob: Blob, user_id: string) => {
     try {
         const formData = new FormData();
@@ -99,4 +99,34 @@ const saveVideoApi = async (videoBlob: Blob, user_id: string) => {
     }
 };
 
-export { signInApi, signUpApi, logoutApi, refreshTokenApi, saveVideoApi };
+//api for saving image
+const saveImageApi = async (imageBase64: string, user_id: string) => {
+    try {
+        // Convert base64 string to Blob
+        const base64Response = await fetch(imageBase64);
+        const imageBlob = await base64Response.blob();
+
+        const formData = new FormData();
+
+        const extension = ".jpg";
+        formData.append("image", imageBlob, `kyc-image${extension}`);
+        formData.append("userId", user_id);
+
+        const response = await axiosInstance.post("/kyc-image", formData);
+
+        return {
+            success: true,
+            message: response.data.message,
+            data: null,
+        };
+    } catch (error: any) {
+        console.log(error.message);
+        return {
+            success: false,
+            message: error.response.data.message || "Something went wrong",
+            data: null,
+        };
+    }
+};
+
+export { signInApi, signUpApi, logoutApi, refreshTokenApi, saveVideoApi, saveImageApi };

@@ -35,4 +35,9 @@ userRoute
     .all(verifyToken, upload.single("video"))
     .post((req, res) => userController.uploadVideo(req, res));
 
+userRoute
+    .route("/kyc-image")
+    .all(verifyToken, upload.single("image"))
+    .post((req, res) => userController.uploadImage(req, res));
+
 export default userRoute;

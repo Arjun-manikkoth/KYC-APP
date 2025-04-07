@@ -10,6 +10,7 @@ import { generateTokens } from "../../utils/GenerateTokens";
 import { verifyToken } from "../../utils/CheckToken";
 import { IRefreshTokenResponse } from "../../interfaces/IRefreshToken";
 import { uploadVideo } from "../../utils/Cloudinary";
+import { uploadImage } from "../../utils/Cloudinary";
 
 class UserService implements IUserService {
     constructor(
@@ -120,11 +121,21 @@ class UserService implements IUserService {
     async uploadVideo(video: Express.Multer.File, userId: string): Promise<void> {
         try {
             const url = await uploadVideo(video);
-            console.log(url, "url");
+
             await this.mediaRepository.createMedia({ url, type: "video", userId });
         } catch (error: any) {
             console.log(error.message);
             throw new Error("Failed to upload video");
+        }
+    }
+
+    async uploadImage(image: Express.Multer.File, userId: string): Promise<void> {
+        try {
+            const url = await uploadImage(image);
+            await this.mediaRepository.createMedia({ url, type: "image", userId });
+        } catch (error: any) {
+            console.log(error.message);
+            throw new Error("Failed to upload image");
         }
     }
 }

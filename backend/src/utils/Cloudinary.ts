@@ -1,33 +1,43 @@
 import { v2 as cloudinary } from "cloudinary";
-import { upload } from "./Multer";
 
 // Configure Cloudinary
-export default cloudinary.config({
+cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadVideo = async (video: Express.Multer.File) => {
+// Shared upload logic
+const uploadToCloudinary = async (
+    file: Express.Multer.File,
+    resourceType: "image" | "video",
+    folder: string
+) => {
     try {
         const customName = `kyc_${Date.now()}`;
+        const fileData = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
 
-        // Create a proper data URI from the buffer
-        const fileData = `data:${video.mimetype};base64,${video.buffer.toString("base64")}`;
-
-        // Upload video to Cloudinary
-        const uploadedVideo = await cloudinary.uploader.upload(fileData, {
+        const result = await cloudinary.uploader.upload(fileData, {
             public_id: customName,
             overwrite: true,
-            resource_type: "video", // Specify video resource type
-            folder: "kyc-videos", // Optional: organize in a folder
+            resource_type: resourceType,
+            folder,
         });
-        console.log(uploadedVideo, "uploaded video");
-        return uploadedVideo.url;
+
+        return result.secure_url;
     } catch (error: any) {
-        console.error("Error uploading video:", error.message);
-        throw new Error("Failed to upload video");
+        console.error(`Error uploading ${resourceType}:`, error.message);
+        throw new Error(`Failed to upload ${resourceType}`);
     }
 };
 
-export { uploadVideo };
+// Explicit functions for images/videos
+const uploadImage = async (image: Express.Multer.File) => {
+    return uploadToCloudinary(image, "image", "kyc-images");
+};
+
+const uploadVideo = async (video: Express.Multer.File) => {
+    return uploadToCloudinary(video, "video", "kyc-videos");
+};
+
+export { uploadImage, uploadVideo };
