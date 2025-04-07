@@ -1,5 +1,6 @@
 import { saveImageApi } from "@/api/api";
 import React, { useRef, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Webcam from "react-webcam";
 import { RootState } from "@/redux/store";
@@ -9,6 +10,7 @@ const ImageKYC: React.FC = () => {
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const user = useSelector((state: RootState) => state.user);
+    const navigate = useNavigate();
 
     const videoConstraints = {
         width: 1280,
@@ -36,10 +38,19 @@ const ImageKYC: React.FC = () => {
             setError("No image captured yet.");
             return;
         }
+        try {
+            const status = await saveImageApi(imageSrc, user.id || "");
 
-        await saveImageApi(imageSrc, user.id || "");
-
-        setImageSrc(null);
+            if (status.success) {
+                setError(null);
+                navigate("/dashboard");
+            } else {
+                setError("Failed to save Image.Try again after sometime");
+            }
+        } catch (error: any) {
+            console.log(error.message);
+            setError("Failed to upload image");
+        }
     }, [imageSrc]);
 
     return (

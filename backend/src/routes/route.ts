@@ -40,4 +40,9 @@ userRoute
     .all(verifyToken, upload.single("image"))
     .post((req, res) => userController.uploadImage(req, res));
 
+userRoute
+    .route("/:id/dashboard")
+    .all(verifyToken)
+    .get((req, res) => userController.getDashboard(req, res));
+
 export default userRoute;

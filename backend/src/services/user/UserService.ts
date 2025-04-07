@@ -11,6 +11,7 @@ import { verifyToken } from "../../utils/CheckToken";
 import { IRefreshTokenResponse } from "../../interfaces/IRefreshToken";
 import { uploadVideo } from "../../utils/Cloudinary";
 import { uploadImage } from "../../utils/Cloudinary";
+import { IDashboardResponse } from "../../interfaces/IMedia";
 
 class UserService implements IUserService {
     constructor(
@@ -136,6 +137,15 @@ class UserService implements IUserService {
         } catch (error: any) {
             console.log(error.message);
             throw new Error("Failed to upload image");
+        }
+    }
+
+    async fetchDashboard(id: string, search: string, page: number): Promise<IDashboardResponse> {
+        try {
+            return await this.mediaRepository.getDashboard(id, search, page);
+        } catch (error: any) {
+            console.log(error);
+            throw new Error("Failed to fetch dashboard");
         }
     }
 }

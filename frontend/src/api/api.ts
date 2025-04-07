@@ -121,6 +121,7 @@ const saveImageApi = async (imageBase64: string, user_id: string) => {
         };
     } catch (error: any) {
         console.log(error.message);
+        console.log("catch triggered");
         return {
             success: false,
             message: error.response.data.message || "Something went wrong",
@@ -129,4 +130,33 @@ const saveImageApi = async (imageBase64: string, user_id: string) => {
     }
 };
 
-export { signInApi, signUpApi, logoutApi, refreshTokenApi, saveVideoApi, saveImageApi };
+//api fetching dashboard based on search
+const dashboardApi = async (id: string, search: string, page: number) => {
+    try {
+        const response = await axiosInstance.get(`${id}/dashboard?search=${search}&page=${page}`);
+
+        return {
+            success: true,
+            message: response.data.message,
+            data: response.data.data,
+        };
+    } catch (error: any) {
+        console.log(error.message);
+        console.log("catch triggered");
+        return {
+            success: false,
+            message: error.response.data.message || "Something went wrong",
+            data: null,
+        };
+    }
+};
+
+export {
+    signInApi,
+    signUpApi,
+    logoutApi,
+    refreshTokenApi,
+    saveVideoApi,
+    saveImageApi,
+    dashboardApi,
+};

@@ -6,6 +6,7 @@ import {
     tokenMessages,
     videoMessages,
     imageMessages,
+    dashboardMessages,
 } from "../constants/Messages";
 import { HTTP_STATUS } from "../constants/StatusCodes";
 
@@ -235,6 +236,44 @@ class UserController {
                 message: imageMessages.IMAGE_UPLOAD_SUCCESS,
                 data: status,
             });
+        } catch (error: any) {
+            console.log(error.message);
+            res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: GeneralMessages.INTERNAL_SERVER_ERROR,
+                data: null,
+            });
+        }
+    }
+
+    async getDashboard(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.query.page || !req.params.id) {
+                res.status(HTTP_STATUS.BAD_REQUEST).json({
+                    success: false,
+                    message: dashboardMessages.GET_DASHBOARD_REQUIRED_FIELDS,
+                    data: null,
+                });
+                return;
+            }
+            const status = await this.userService.fetchDashboard(
+                req.params.id,
+                req.query.search as string,
+                Number(req.query.page)
+            );
+            if (status.data.length > 0) {
+                res.status(HTTP_STATUS.OK).json({
+                    success: true,
+                    message: dashboardMessages.GET_DASHBOARD_SUCCESS,
+                    data: status,
+                });
+            } else {
+                res.status(HTTP_STATUS.NOT_FOUND).json({
+                    success: true,
+                    message: dashboardMessages.GET_DASHBOARD_FAILED,
+                    data: status,
+                });
+            }
         } catch (error: any) {
             console.log(error.message);
             res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
