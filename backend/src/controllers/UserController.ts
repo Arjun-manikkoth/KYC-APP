@@ -1,6 +1,6 @@
 import IUserService from "../services/user/IUserService";
 import { Request, Response } from "express";
-import { AuthMessages, GeneralMessages, tokenMessages } from "../constants/Messages";
+import { AuthMessages, GeneralMessages, tokenMessages, videoMessages } from "../constants/Messages";
 import { HTTP_STATUS } from "../constants/StatusCodes";
 
 class UserController {
@@ -177,6 +177,33 @@ class UserController {
             }
         } catch (error: any) {
             console.error(error.message);
+            res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: GeneralMessages.INTERNAL_SERVER_ERROR,
+                data: null,
+            });
+        }
+    }
+
+    async uploadVideo(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.file || !req.body.userId) {
+                res.status(HTTP_STATUS.BAD_REQUEST).json({
+                    success: false,
+                    message: videoMessages.VIDEO_UPLOAD_REQUIRED_FIELDS,
+                    data: null,
+                });
+                return;
+            }
+            const status = await this.userService.uploadVideo(req.file, req.body.userId);
+
+            res.status(HTTP_STATUS.OK).json({
+                success: true,
+                message: videoMessages.VIDEO_UPLOAD_SUCCESS,
+                data: status,
+            });
+        } catch (error: any) {
+            console.log(error.message);
             res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: GeneralMessages.INTERNAL_SERVER_ERROR,

@@ -4,6 +4,6 @@ import { RootState } from "@/redux/store";
 
 // For routes that should ONLY be accessible when NOT logged in (login/register)
 export const AuthProtected = () => {
-    const { id } = useSelector((state: RootState) => state);
+    const { id } = useSelector((state: RootState) => state.user);
     return id ? <Navigate to="/dashboard" replace /> : <Outlet />;
 };

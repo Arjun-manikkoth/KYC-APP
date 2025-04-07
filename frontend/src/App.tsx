@@ -4,6 +4,8 @@ import LoginPage from "./pages/Login";
 import DashboardPage from "./pages/Dashboard";
 import UserProtected from "./components/ProtectedUser";
 import { AuthProtected } from "./components/AuthProtected";
+import VideoKYCPage from "./pages/VideoKYC";
+import ImageKYCPage from "./pages/ImageKYC";
 
 const App: React.FC = () => {
     return (
@@ -17,6 +19,8 @@ const App: React.FC = () => {
 
                     <Route Component={UserProtected}>
                         <Route path="/dashboard" Component={DashboardPage} />
+                        <Route path="/video-kyc" Component={VideoKYCPage} />
+                        <Route path="/image-kyc" Component={ImageKYCPage} />
                     </Route>
                 </Routes>
             </Router>

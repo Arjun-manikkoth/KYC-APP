@@ -74,4 +74,29 @@ const refreshTokenApi = async () => {
     }
 };
 
-export { signInApi, signUpApi, logoutApi, refreshTokenApi };
+//api for refreshing access token
+const saveVideoApi = async (videoBlob: Blob, user_id: string) => {
+    try {
+        const formData = new FormData();
+
+        formData.append("video", videoBlob, "kyc-video.webm"); // Send as Blob with filename
+        formData.append("userId", user_id);
+
+        const response = await axiosInstance.post("/kyc-video", formData);
+
+        return {
+            success: true,
+            message: response.data.message,
+            data: null,
+        };
+    } catch (error: any) {
+        console.log(error.message);
+        return {
+            success: false,
+            message: error.response.data.message || "Something went wrong",
+            data: null,
+        };
+    }
+};
+
+export { signInApi, signUpApi, logoutApi, refreshTokenApi, saveVideoApi };

@@ -1,16 +1,21 @@
 import { ISignUp } from "../../interfaces/UserInterface";
 import IUserService from "./IUserService";
 import IUserRepository from "../../repositories/user/IUserRepository";
+import IMediaRepository from "../../repositories/media/IMediaRepository";
 import { ISignUpResponse, ISignIn, ISignInResponse } from "../../interfaces/UserInterface";
 import { hashPassword, comparePasswords } from "../../utils/HashPassword";
-import { AuthMessages, GeneralMessages } from "../../constants/Messages";
+import { AuthMessages } from "../../constants/Messages";
 import { HTTP_STATUS } from "../../constants/StatusCodes";
 import { generateTokens } from "../../utils/GenerateTokens";
 import { verifyToken } from "../../utils/CheckToken";
 import { IRefreshTokenResponse } from "../../interfaces/IRefreshToken";
+import { uploadVideo } from "../../utils/Cloudinary";
 
 class UserService implements IUserService {
-    constructor(private userRepository: IUserRepository) {}
+    constructor(
+        private userRepository: IUserRepository,
+        private mediaRepository: IMediaRepository
+    ) {}
 
     //creates a new user document without duplicates
     async createUser(userData: ISignUp): Promise<ISignUpResponse> {
@@ -21,7 +26,7 @@ class UserService implements IUserService {
                 const hashedPassword = await hashPassword(userData.password);
                 userData.password = hashedPassword;
 
-                const status = await this.userRepository.insertUser(userData);
+                await this.userRepository.insertUser(userData);
 
                 return {
                     statusCode: HTTP_STATUS.CREATED,
@@ -109,6 +114,17 @@ class UserService implements IUserService {
         } catch (error: any) {
             console.log(error.message);
             throw new Error("Failed to create refresh token");
+        }
+    }
+
+    async uploadVideo(video: Express.Multer.File, userId: string): Promise<void> {
+        try {
+            const url = await uploadVideo(video);
+            console.log(url, "url");
+            await this.mediaRepository.createMedia({ url, type: "video", userId });
+        } catch (error: any) {
+            console.log(error.message);
+            throw new Error("Failed to upload video");
         }
     }
 }

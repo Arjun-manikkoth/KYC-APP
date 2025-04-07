@@ -5,14 +5,14 @@ import User from "../../models/UserModel";
 
 class UserRepository implements IUserRepository {
     //creates new user to db
-    async insertUser(signUpData: ISignUp): Promise<IUser> {
+    async insertUser(signUpData: ISignUp): Promise<void> {
         try {
             const user = new User({
                 email: signUpData.email,
                 password: signUpData.password,
             });
 
-            return await user.save();
+            await user.save();
         } catch (error: any) {
             console.log(error.message);
             throw new Error("Failed to create document");

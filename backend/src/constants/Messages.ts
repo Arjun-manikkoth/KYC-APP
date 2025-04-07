@@ -19,3 +19,9 @@ export const tokenMessages = {
     ACCESS_TOKEN_SUCCESS: "Access Token sent successfully",
     TOKEN_ERROR: "Token error",
 };
+
+export const videoMessages = {
+    VIDEO_UPLOAD_REQUIRED_FIELDS: "User id and video are required fields",
+    VIDEO_UPLOAD_SUCCESS: "Video uploaded successfully",
+    VIDEO_UPLOAD_FAILED: "Failed to upload video",
+};
