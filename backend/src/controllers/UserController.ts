@@ -68,16 +68,16 @@ class UserController {
                 res.status(HTTP_STATUS.OK)
                     .cookie("accessToken", response.accessToken, {
                         httpOnly: true,
-                        secure: false,
-                        // sameSite: "none",
+                        secure: true,
+                        sameSite: "none",
                         maxAge: process.env.MAX_AGE_ACCESS_COOKIE
                             ? parseInt(process.env.MAX_AGE_ACCESS_COOKIE)
                             : 15 * 60 * 1000, // 15 minutes
                     })
                     .cookie("refreshToken", response.refreshToken, {
                         httpOnly: true,
-                        secure: false,
-                        //sameSite: "none",
+                        secure: true,
+                        sameSite: "none",
                         maxAge: process.env.MAX_AGE_REFRESH_COOKIE
                             ? parseInt(process.env.MAX_AGE_REFRESH_COOKIE)
                             : 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -122,11 +122,13 @@ class UserController {
         try {
             res.clearCookie("accessToken", {
                 httpOnly: true,
-                secure: false, //sameSite: "none"
+                secure: true,
+                sameSite: "none",
             });
             res.clearCookie("refreshToken", {
                 httpOnly: true,
-                secure: false, // sameSite: "none"
+                secure: true,
+                sameSite: "none",
             });
 
             res.status(HTTP_STATUS.OK).json({
@@ -164,8 +166,8 @@ class UserController {
                 res.status(HTTP_STATUS.CREATED)
                     .cookie("accessToken", response.accessToken, {
                         httpOnly: true,
-                        secure: false,
-                        //   sameSite: "none",
+                        secure: true,
+                        sameSite: "none",
                         maxAge: process.env.MAX_AGE_ACCESS_COOKIE
                             ? parseInt(process.env.MAX_AGE_ACCESS_COOKIE)
                             : 15 * 60 * 1000, // 15 minutes
